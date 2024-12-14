@@ -138,49 +138,53 @@ export default function AdminPanel() {
                   </Skeleton>
 
                   {/* NoDatum UTxOs */}
-                  {campaign.CampaignInfo.data.noDatum.length > 0 && (
+                  {new Date() > campaign.CampaignInfo.data.deadline && (
                     <>
-                      <Divider />
-                      <div className="flex justify-between w-full px-3">
-                        {/* NoDatum UTxOs Label */}
+                      {campaign.CampaignInfo.data.noDatum.length > 0 && (
+                        <>
+                          <Divider />
+                          <div className="flex justify-between w-full px-3">
+                            {/* NoDatum UTxOs Label */}
+                            <Skeleton
+                              className="rounded-lg w-fit my-auto"
+                              isLoaded={!isQueryingCampaign}
+                            >
+                              <span className="font-bold">NoDatum UTxOs</span>
+                            </Skeleton>
+
+                            {/* Claim All Button */}
+                            {campaign.CampaignInfo.data.noDatum.length > 1 && (
+                              <Skeleton
+                                className="rounded-lg w-fit"
+                                isLoaded={!isQueryingCampaign}
+                              >
+                                <ButtonClaimAllNoDatumUTXOs
+                                  campaign={campaign}
+                                  onError={handleError}
+                                  onSuccess={setCampaign}
+                                />
+                              </Skeleton>
+                            )}
+                          </div>
+                          <Divider />
+                        </>
+                      )}
+                      {campaign.CampaignInfo.data.noDatum.map((utxo) => (
                         <Skeleton
-                          className="rounded-lg w-fit my-auto"
+                          key={`${utxo.txHash}#${utxo.outputIndex}`}
+                          className="rounded-lg w-full"
                           isLoaded={!isQueryingCampaign}
                         >
-                          <span className="font-bold">NoDatum UTxOs</span>
+                          <NoDatumUTxO
+                            campaign={campaign}
+                            utxo={utxo}
+                            onError={handleError}
+                            onSuccess={setCampaign}
+                          />
                         </Skeleton>
-
-                        {/* Claim All Button */}
-                        {campaign.CampaignInfo.data.noDatum.length > 1 && (
-                          <Skeleton
-                            className="rounded-lg w-fit"
-                            isLoaded={!isQueryingCampaign}
-                          >
-                            <ButtonClaimAllNoDatumUTXOs
-                              campaign={campaign}
-                              onError={handleError}
-                              onSuccess={setCampaign}
-                            />
-                          </Skeleton>
-                        )}
-                      </div>
-                      <Divider />
+                      ))}
                     </>
                   )}
-                  {campaign.CampaignInfo.data.noDatum.map((utxo) => (
-                    <Skeleton
-                      key={`${utxo.txHash}#${utxo.outputIndex}`}
-                      className="rounded-lg w-full"
-                      isLoaded={!isQueryingCampaign}
-                    >
-                      <NoDatumUTxO
-                        campaign={campaign}
-                        utxo={utxo}
-                        onError={handleError}
-                        onSuccess={setCampaign}
-                      />
-                    </Skeleton>
-                  ))}
                 </div>
               )}
             </div>
