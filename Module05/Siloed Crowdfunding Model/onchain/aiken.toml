@@ -1,0 +1,29 @@
+name = "siloed-crowdfunding-model-v1/onchain"
+version = "0.0.0"
+compiler = "v1.1.9"
+plutus = "v3"
+license = "Apache-2.0"
+description = "Aiken contracts for project 'siloed-crowdfunding-model-v1/onchain'"
+
+[repository]
+user = "siloed-crowdfunding-model-v1"
+project = "onchain"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "2.2.0"
+source = "github"
+
+[[dependencies]]
+name = "aiken-extra/time_util"
+version = "5.220.202412"
+source = "github"
+
+[[dependencies]]
+name = "aiken-extra/tx_util"
+version = "2.220.202412"
+source = "github"
+
+[config.default]
+state_token = "STATE_TOKEN"
