@@ -14,25 +14,25 @@ You can fork the following repositories. When you push your exercise repo commit
 
 Aiken primitive types:
 
-- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_primitive_types): In this project, we take a look into 10 Aiken primitive types
+- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_primitive_types): In this project, we take a look at Aiken primitive types
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_primitive_exercise): Fix all the syntax and then run `aiken c`, all the tests must PASS
 
 Custom types:
 
-- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_custom_types): In this project, we take a look into Aiken custom, opaque, and recursive types
+- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_custom_types): In this project, we take a look at Aiken custom, opaque, and recursive types
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_custom_types_exercise): Your task is to FIX All the types, and play around with them afterward
 
 ### Core Features
 
 Constants, conditional modules, and `aiken docs`:
 
-- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_const_showcase): In this project, we take a look into `const`, `aiken docs`, `env` and `config`
+- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_const_showcase): In this project, we take a look at `const`, `aiken docs`, `env` and `config`
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_const_exercise): Your task is to define all needed constants to PASS All the tests
 - [answers repo](https://github.com/ariady-putra-emurgo/aiken_const_answers): This project contains the answers to the exercise repo
 
 Functions:
 
-- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_fn_showcase): In this project, we take a look into functions and anonymous functions
+- [showcase repo](https://github.com/ariady-putra-emurgo/aiken_fn_showcase): In this project, we take a look at functions and anonymous functions
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_fn_exercise): Your task is to define all needed functions to PASS All the tests
 - [answers repo](https://github.com/ariady-putra-emurgo/aiken_fn_answers): This project contains the answers to the exercise repo
 
