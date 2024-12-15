@@ -4,7 +4,7 @@ Emurgo Academy's BuildNOW Aiken course materials.
 
 ## Aiken Roadmap
 
-![aiken-roadmap](https://github.com/user-attachments/assets/e0c89fa1-6927-4d8e-99f5-c352a6fb047b)
+![aiken_roadmap](https://github.com/user-attachments/assets/31c6b0f4-42f3-4e34-96d1-af3a3fb7183f)
 
 ## Suplemental Materials
 
