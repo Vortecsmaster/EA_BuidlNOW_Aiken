@@ -24,12 +24,7 @@ import { BackerUTxO, CampaignUTxO } from "./contexts/campaign/CampaignContext";
 import { network } from "@/config/lucid";
 import { script } from "@/config/script";
 import { STATE_TOKEN } from "@/config/crowdfunding";
-import {
-  BackerDatum,
-  CampaignActionRedeemer,
-  CampaignDatum,
-  CampaignState,
-} from "@/types/crowdfunding";
+import { BackerDatum, CampaignActionRedeemer, CampaignDatum, CampaignState } from "@/types/crowdfunding";
 import { Platform } from "@/types/platform";
 
 async function submitTx(tx: TxSignBuilder) {
@@ -40,8 +35,7 @@ async function submitTx(tx: TxSignBuilder) {
 }
 
 function getShortestUTxO(utxos: UTxO[]) {
-  const bigint2str = (_: any, val: { toString: () => any }) =>
-    typeof val === "bigint" ? val.toString() : val;
+  const bigint2str = (_: any, val: { toString: () => any }) => (typeof val === "bigint" ? val.toString() : val);
 
   let shortestUTxO = JSON.stringify(utxos[0], bigint2str).length;
   let utxo = utxos[0];
@@ -58,17 +52,13 @@ function getShortestUTxO(utxos: UTxO[]) {
   return utxo;
 }
 
-export async function queryCampaign(
-  { lucid, wallet }: WalletConnection,
-  campaignPolicyId: PolicyId,
-): Promise<CampaignUTxO> {
+export async function queryCampaign({ lucid, wallet }: WalletConnection, campaignPolicyId: PolicyId): Promise<CampaignUTxO> {
   if (!lucid) throw "Uninitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
 
   //#region Campaign Info
   const campaign = await koios.getTokenMetadata(campaignPolicyId);
-  const { platform, creator, hash, index } =
-    campaign[campaignPolicyId].STATE_TOKEN;
+  const { platform, creator, hash, index } = campaign[campaignPolicyId].STATE_TOKEN;
   const StateTokenUnit = toUnit(campaignPolicyId, STATE_TOKEN.hex); // `${PolicyID}${AssetName}`
 
   const nonceTxHash = String(hash);
@@ -77,19 +67,12 @@ export async function queryCampaign(
 
   const campaignValidator: Validator = {
     type: "PlutusV3",
-    script: applyParamsToScript(script.Crowdfunding, [
-      platform,
-      creator,
-      nonceORef,
-    ]),
+    script: applyParamsToScript(script.Crowdfunding, [platform, creator, nonceORef]),
   };
   const campaignAddress = validatorToAddress(network, campaignValidator);
   //#endregion
 
-  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(
-    campaignAddress,
-    StateTokenUnit,
-  );
+  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(campaignAddress, StateTokenUnit);
 
   if (!StateTokenUTxO.datum) throw "No Datum";
 
@@ -124,9 +107,7 @@ export async function queryCampaign(
         const backerAddress = credentialToAddress(network, backerPk, backerSk);
 
         const supportLovelace = utxo.assets.lovelace;
-        const supportADA = parseFloat(
-          `${supportLovelace / 1_000000n}.${supportLovelace % 1_000000n}`,
-        );
+        const supportADA = parseFloat(`${supportLovelace / 1_000000n}.${supportLovelace % 1_000000n}`);
 
         backers.push({
           utxo,
@@ -144,13 +125,8 @@ export async function queryCampaign(
   }
   //#endregion
 
-  const supportLovelace = backers.reduce(
-    (sum, { support }) => sum + support.lovelace,
-    0n,
-  );
-  const supportADA = parseFloat(
-    `${supportLovelace / 1_000000n}.${supportLovelace % 1_000000n}`,
-  );
+  const supportLovelace = backers.reduce((sum, { support }) => sum + support.lovelace, 0n);
+  const supportADA = parseFloat(`${supportLovelace / 1_000000n}.${supportLovelace % 1_000000n}`);
 
   return {
     CampaignInfo: {
@@ -162,9 +138,7 @@ export async function queryCampaign(
       datum: campaignDatum,
       data: {
         name: toText(campaignDatum.name),
-        goal: parseFloat(
-          `${campaignDatum.goal / 1_000000n}.${campaignDatum.goal % 1_000000n}`,
-        ),
+        goal: parseFloat(`${campaignDatum.goal / 1_000000n}.${campaignDatum.goal % 1_000000n}`),
         deadline: new Date(parseInt(campaignDatum.deadline.toString())),
         creator: { pk: creatorPk, sk: creatorSk, address: creatorAddress },
         backers,
@@ -182,21 +156,19 @@ export async function queryCampaign(
 
 export async function createCampaign(
   { lucid, wallet, address, pkh, stakeAddress, skh }: WalletConnection,
-  campaign: { name: string; goal: Lovelace; deadline: bigint },
+  campaign: { name: string; goal: Lovelace; deadline: bigint }
 ): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
 
   const crowdfundingPlatform = localStorage.getItem("CrowdfundingPlatform");
 
-  if (!crowdfundingPlatform)
-    throw "Go to Admin page to set the Crowdfunding Platform Address first!";
+  if (!crowdfundingPlatform) throw "Go to Admin page to set the Crowdfunding Platform Address first!";
 
   const platform = JSON.parse(crowdfundingPlatform); // Platform { address, pkh, stakeAddress, skh }
   const creator = { address, pkh, stakeAddress, skh };
 
-  if (!creator.address && !creator.pkh && creator.stakeAddress && !creator.skh)
-    throw "Unconnected Wallet";
+  if (!creator.address && !creator.pkh && creator.stakeAddress && !creator.skh) throw "Unconnected Wallet";
 
   if (!lucid.wallet()) {
     const api = await wallet.enable();
@@ -215,11 +187,7 @@ export async function createCampaign(
 
   const campaignValidator: Validator = {
     type: "PlutusV3",
-    script: applyParamsToScript(script.Crowdfunding, [
-      platform.pkh ?? "",
-      creator.pkh ?? "",
-      nonceORef,
-    ]),
+    script: applyParamsToScript(script.Crowdfunding, [platform.pkh ?? "", creator.pkh ?? "", nonceORef]),
   };
   const campaignPolicy = mintingPolicyToId(campaignValidator);
   const campaignAddress = validatorToAddress(network, campaignValidator);
@@ -253,13 +221,9 @@ export async function createCampaign(
       },
     })
     .attach.MintingPolicy(campaignValidator)
-    .pay.ToContract(
-      campaignAddress,
-      { kind: "inline", value: mintRedeemer },
-      StateToken,
-    )
+    .pay.ToContract(campaignAddress, { kind: "inline", value: mintRedeemer }, StateToken)
     .validFrom(now)
-    .complete({ localUPLCEval: false });
+    .complete();
 
   const txHash = await submitTx(tx);
 
@@ -275,9 +239,7 @@ export async function createCampaign(
       datum: campaignDatum,
       data: {
         name: campaign.name,
-        goal: parseFloat(
-          `${campaign.goal / 1_000000n}.${campaign.goal % 1_000000n}`,
-        ),
+        goal: parseFloat(`${campaign.goal / 1_000000n}.${campaign.goal % 1_000000n}`),
         deadline: new Date(parseInt(campaign.deadline.toString())),
         creator: {
           pk: keyHashToCredential(creator.pkh ?? ""),
@@ -303,21 +265,14 @@ export async function createCampaign(
   };
 }
 
-export async function cancelCampaign(
-  { lucid, wallet }: WalletConnection,
-  campaign?: CampaignUTxO,
-  platform?: Platform,
-): Promise<CampaignUTxO> {
+export async function cancelCampaign({ lucid, wallet }: WalletConnection, campaign?: CampaignUTxO, platform?: Platform): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
   if (!campaign) throw "No Campaign";
 
   const { CampaignInfo, StateToken } = campaign;
 
-  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(
-    CampaignInfo.address,
-    StateToken.unit,
-  );
+  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(CampaignInfo.address, StateToken.unit);
 
   const newState: CampaignState = "Cancelled";
   const updatedDatum: CampaignDatum = {
@@ -336,11 +291,7 @@ export async function cancelCampaign(
     .newTx()
     .collectFrom([StateTokenUTxO], CampaignActionRedeemer.Cancel) // TxInput: StateToken UTxO
     .attach.SpendingValidator(CampaignInfo.validator)
-    .pay.ToContract(
-      CampaignInfo.address,
-      { kind: "inline", value: datum },
-      { [StateToken.unit]: 1n },
-    ); // TxOutput: Resend StateToken
+    .pay.ToContract(CampaignInfo.address, { kind: "inline", value: datum }, { [StateToken.unit]: 1n }); // TxOutput: Resend StateToken
 
   //#region Either executed by the crowdfunding platform, or by the campaign creator
   if (platform) {
@@ -355,7 +306,7 @@ export async function cancelCampaign(
   }
   //#endregion
 
-  const tx = await newTx.complete({ localUPLCEval: false });
+  const tx = await newTx.complete();
 
   const txHash = await submitTx(tx);
 
@@ -377,7 +328,7 @@ export async function cancelCampaign(
 export async function supportCampaign(
   { lucid, wallet, pkh, skh, address }: WalletConnection,
   campaign?: CampaignUTxO,
-  supportADA?: string,
+  supportADA?: string
 ): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
@@ -402,14 +353,7 @@ export async function supportCampaign(
     lucid.selectWallet.fromAPI(api);
   }
 
-  const tx = await lucid
-    .newTx()
-    .pay.ToContract(
-      CampaignInfo.address,
-      { kind: "inline", value: datum },
-      { lovelace },
-    )
-    .complete();
+  const tx = await lucid.newTx().pay.ToContract(CampaignInfo.address, { kind: "inline", value: datum }, { lovelace }).complete();
 
   const txHash = await submitTx(tx);
 
@@ -448,21 +392,14 @@ export async function supportCampaign(
   };
 }
 
-export async function finishCampaign(
-  { lucid, wallet }: WalletConnection,
-  campaign?: CampaignUTxO,
-  platform?: Platform,
-): Promise<CampaignUTxO> {
+export async function finishCampaign({ lucid, wallet }: WalletConnection, campaign?: CampaignUTxO, platform?: Platform): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
   if (!campaign) throw "No Campaign";
 
   const { CampaignInfo, StateToken } = campaign;
 
-  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(
-    CampaignInfo.address,
-    StateToken.unit,
-  );
+  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(CampaignInfo.address, StateToken.unit);
 
   const newState: CampaignState = "Finished";
   const updatedDatum: CampaignDatum = {
@@ -479,16 +416,9 @@ export async function finishCampaign(
 
   let newTx = lucid
     .newTx()
-    .collectFrom(
-      [StateTokenUTxO, ...CampaignInfo.data.backers.map(({ utxo }) => utxo)],
-      CampaignActionRedeemer.Finish,
-    ) // TxInputs: StateToken UTxO & Support
+    .collectFrom([StateTokenUTxO, ...CampaignInfo.data.backers.map(({ utxo }) => utxo)], CampaignActionRedeemer.Finish) // TxInputs: StateToken UTxO & Support
     .attach.SpendingValidator(CampaignInfo.validator)
-    .pay.ToContract(
-      CampaignInfo.address,
-      { kind: "inline", value: datum },
-      { [StateToken.unit]: 1n },
-    ) // TxOutput: Resend StateToken
+    .pay.ToContract(CampaignInfo.address, { kind: "inline", value: datum }, { [StateToken.unit]: 1n }) // TxOutput: Resend StateToken
     .pay.ToAddress(CampaignInfo.data.creator.address, {
       lovelace: CampaignInfo.data.support.lovelace,
     }); // TxOutput: Send support to the campaign creator
@@ -506,7 +436,7 @@ export async function finishCampaign(
   }
   //#endregion
 
-  const tx = await newTx.complete({ localUPLCEval: false });
+  const tx = await newTx.complete();
 
   const txHash = await submitTx(tx);
 
@@ -530,11 +460,7 @@ export async function finishCampaign(
   };
 }
 
-export async function refundCampaign(
-  { lucid, wallet, address }: WalletConnection,
-  campaign?: CampaignUTxO,
-  platform?: Platform,
-): Promise<CampaignUTxO> {
+export async function refundCampaign({ lucid, wallet, address }: WalletConnection, campaign?: CampaignUTxO, platform?: Platform): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
   if (!address) throw "No Address";
@@ -544,18 +470,11 @@ export async function refundCampaign(
 
   if (!CampaignInfo.data.support.ada) throw "Nothing to Refund";
 
-  const currentBacker = platform
-    ? CampaignInfo.data.backers
-    : CampaignInfo.data.backers.filter((backer) => backer.address === address);
-  const backerADA = platform
-    ? CampaignInfo.data.support.ada
-    : currentBacker.reduce((sum, { support }) => sum + support.ada, 0);
+  const currentBacker = platform ? CampaignInfo.data.backers : CampaignInfo.data.backers.filter((backer) => backer.address === address);
+  const backerADA = platform ? CampaignInfo.data.support.ada : currentBacker.reduce((sum, { support }) => sum + support.ada, 0);
 
-  if (!backerADA)
-    throw "You did not support this campaign, or you're already refunded. Incorrect? Contact us!";
-  const backerLovelace = platform
-    ? CampaignInfo.data.support.lovelace
-    : adaToLovelace(`${backerADA}`);
+  if (!backerADA) throw "You did not support this campaign, or you're already refunded. Incorrect? Contact us!";
+  const backerLovelace = platform ? CampaignInfo.data.support.lovelace : adaToLovelace(`${backerADA}`);
 
   if (!lucid.wallet()) {
     const api = await wallet.enable();
@@ -568,7 +487,7 @@ export async function refundCampaign(
     .readFrom([StateToken.utxo]) // TxRefInput: StateToken UTxO
     .collectFrom(
       currentBacker.map(({ utxo }) => utxo),
-      CampaignActionRedeemer.Refund,
+      CampaignActionRedeemer.Refund
     ) // TxInputs: Backer support UTxO(s)
     .attach.SpendingValidator(CampaignInfo.validator);
 
@@ -576,7 +495,7 @@ export async function refundCampaign(
     newTx = newTx.pay.ToAddress(address, { lovelace: support.lovelace }); // TxOutput: Send support back
   }
 
-  const tx = await newTx.complete({ localUPLCEval: false });
+  const tx = await newTx.complete();
 
   const txHash = await submitTx(tx);
 
@@ -588,27 +507,17 @@ export async function refundCampaign(
       ...CampaignInfo,
       data: {
         ...CampaignInfo.data,
-        backers: platform
-          ? []
-          : CampaignInfo.data.backers.filter(
-              (backer) => backer.address !== address,
-            ),
+        backers: platform ? [] : CampaignInfo.data.backers.filter((backer) => backer.address !== address),
         support: {
           ada: platform ? 0 : CampaignInfo.data.support.ada - backerADA,
-          lovelace: platform
-            ? 0n
-            : CampaignInfo.data.support.lovelace - backerLovelace,
+          lovelace: platform ? 0n : CampaignInfo.data.support.lovelace - backerLovelace,
         },
       },
     },
   };
 }
 
-export async function claimNoDatumUTXOs(
-  { lucid, wallet, address }: WalletConnection,
-  campaign: CampaignUTxO,
-  utxo?: UTxO,
-): Promise<CampaignUTxO> {
+export async function claimNoDatumUTXOs({ lucid, wallet, address }: WalletConnection, campaign: CampaignUTxO, utxo?: UTxO): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
   if (!address) throw "No Address";
@@ -627,7 +536,7 @@ export async function claimNoDatumUTXOs(
     .collectFrom(utxo ? [utxo] : CampaignInfo.data.noDatum, Data.void())
     .attach.SpendingValidator(CampaignInfo.validator)
     .addSigner(address)
-    .complete({ localUPLCEval: false });
+    .complete();
 
   const txHash = await submitTx(tx);
 
@@ -639,12 +548,7 @@ export async function claimNoDatumUTXOs(
       ...CampaignInfo,
       data: {
         ...CampaignInfo.data,
-        noDatum: utxo
-          ? CampaignInfo.data.noDatum.filter(
-              ({ txHash, outputIndex }) =>
-                txHash !== utxo.txHash || outputIndex != utxo.outputIndex,
-            )
-          : [],
+        noDatum: utxo ? CampaignInfo.data.noDatum.filter(({ txHash, outputIndex }) => txHash !== utxo.txHash || outputIndex != utxo.outputIndex) : [],
       },
     },
   };
@@ -658,7 +562,7 @@ type HackAction = {
 export async function hackCampaign(
   { lucid, wallet, address }: WalletConnection,
   { action, params }: HackAction,
-  campaign: CampaignUTxO,
+  campaign: CampaignUTxO
 ): Promise<CampaignUTxO> {
   if (!lucid) throw "Unitialized Lucid";
   if (!wallet) throw "Disconnected Wallet";
@@ -666,10 +570,7 @@ export async function hackCampaign(
 
   const { CampaignInfo, StateToken } = campaign;
 
-  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(
-    CampaignInfo.address,
-    StateToken.unit,
-  );
+  const [StateTokenUTxO] = await lucid.utxosAtWithUnit(CampaignInfo.address, StateToken.unit);
 
   if (!lucid.wallet()) {
     const api = await wallet.enable();
@@ -688,17 +589,10 @@ export async function hackCampaign(
       };
       const datum = Data.to(updatedDatum, CampaignDatum);
 
-      let newTx = lucid
-        .newTx()
-        .collectFrom([StateTokenUTxO], CampaignActionRedeemer.Cancel)
-        .attach.SpendingValidator(CampaignInfo.validator);
+      let newTx = lucid.newTx().collectFrom([StateTokenUTxO], CampaignActionRedeemer.Cancel).attach.SpendingValidator(CampaignInfo.validator);
 
       if (payToContract.yes) {
-        newTx = newTx.pay.ToContract(
-          payToContract.address || CampaignInfo.address,
-          { kind: "inline", value: datum },
-          { [StateToken.unit]: 1n },
-        );
+        newTx = newTx.pay.ToContract(payToContract.address || CampaignInfo.address, { kind: "inline", value: datum }, { [StateToken.unit]: 1n });
       }
 
       if (addSigner.yes) {
@@ -706,12 +600,10 @@ export async function hackCampaign(
       }
 
       if (validFrom.yes) {
-        newTx = newTx.validFrom(
-          validFrom.unixTime || (await koios.getBlockTimeMs()),
-        );
+        newTx = newTx.validFrom(validFrom.unixTime || (await koios.getBlockTimeMs()));
       }
 
-      const tx = await newTx.complete({ localUPLCEval: false });
+      const tx = await newTx.complete();
 
       const txHash = await submitTx(tx);
 
@@ -742,40 +634,24 @@ export async function hackCampaign(
 
       let newTx = lucid
         .newTx()
-        .collectFrom(
-          [
-            StateTokenUTxO,
-            ...CampaignInfo.data.backers.map(({ utxo }) => utxo),
-          ],
-          CampaignActionRedeemer.Finish,
-        )
+        .collectFrom([StateTokenUTxO, ...CampaignInfo.data.backers.map(({ utxo }) => utxo)], CampaignActionRedeemer.Finish)
         .attach.SpendingValidator(CampaignInfo.validator);
 
       if (payToAddress.yes) {
-        newTx = newTx.pay.ToAddress(
-          payToAddress.address || CampaignInfo.data.creator.address,
-          {
-            lovelace:
-              payToAddress.lovelace && payToAddress.lovelace > 0n
-                ? payToAddress.lovelace
-                : CampaignInfo.data.support.lovelace,
-          },
-        );
+        newTx = newTx.pay.ToAddress(payToAddress.address || CampaignInfo.data.creator.address, {
+          lovelace: payToAddress.lovelace && payToAddress.lovelace > 0n ? payToAddress.lovelace : CampaignInfo.data.support.lovelace,
+        });
       }
 
       if (payToContract.yes) {
-        newTx = newTx.pay.ToContract(
-          payToContract.address || CampaignInfo.address,
-          { kind: "inline", value: datum },
-          { [StateToken.unit]: 1n },
-        );
+        newTx = newTx.pay.ToContract(payToContract.address || CampaignInfo.address, { kind: "inline", value: datum }, { [StateToken.unit]: 1n });
       }
 
       if (addSigner.yes) {
         newTx = newTx.addSigner(addSigner.address || address);
       }
 
-      const tx = await newTx.complete({ localUPLCEval: false });
+      const tx = await newTx.complete();
 
       const txHash = await submitTx(tx);
 
@@ -809,7 +685,7 @@ export async function hackCampaign(
         .readFrom([StateToken.utxo])
         .collectFrom(
           CampaignInfo.data.backers.map(({ utxo }) => utxo),
-          CampaignActionRedeemer.Refund,
+          CampaignActionRedeemer.Refund
         )
         .attach.SpendingValidator(CampaignInfo.validator);
 
@@ -821,7 +697,7 @@ export async function hackCampaign(
         }
       }
 
-      const tx = await newTx.complete({ localUPLCEval: false });
+      const tx = await newTx.complete();
 
       const txHash = await submitTx(tx);
 
@@ -852,22 +728,15 @@ export async function hackCampaign(
 
       let newTx = lucid
         .newTx()
-        .collectFrom(
-          [StateTokenUTxO],
-          constr.yes ? Data.to(new Constr(constr.index ?? 3, [])) : undefined,
-        )
+        .collectFrom([StateTokenUTxO], constr.yes ? Data.to(new Constr(constr.index ?? 3, [])) : undefined)
         .attach.SpendingValidator(CampaignInfo.validator)
-        .pay.ToContract(
-          CampaignInfo.address,
-          { kind: "inline", value: datum },
-          { [StateToken.unit]: 1n },
-        );
+        .pay.ToContract(CampaignInfo.address, { kind: "inline", value: datum }, { [StateToken.unit]: 1n });
 
       if (addSigner.yes) {
         newTx = newTx.addSigner(addSigner.address || address);
       }
 
-      const tx = await newTx.complete({ localUPLCEval: false });
+      const tx = await newTx.complete();
 
       const txHash = await submitTx(tx);
 
@@ -893,12 +762,8 @@ export async function hackCampaign(
         .newTx()
         .readFrom([StateToken.utxo])
         .collectFrom(
-          outRef.yes
-            ? await lucid.utxosByOutRef([
-                { txHash: outRef.txHash, outputIndex: outRef.outputIndex },
-              ])
-            : CampaignInfo.data.noDatum,
-          Data.void(),
+          outRef.yes ? await lucid.utxosByOutRef([{ txHash: outRef.txHash, outputIndex: outRef.outputIndex }]) : CampaignInfo.data.noDatum,
+          Data.void()
         )
         .attach.SpendingValidator(CampaignInfo.validator);
 
@@ -906,7 +771,7 @@ export async function hackCampaign(
         newTx = newTx.addSigner(addSigner.address || address);
       }
 
-      const tx = await newTx.complete({ localUPLCEval: false });
+      const tx = await newTx.complete();
 
       const txHash = await submitTx(tx);
 
@@ -919,11 +784,7 @@ export async function hackCampaign(
           data: {
             ...CampaignInfo.data,
             noDatum: outRef.yes
-              ? CampaignInfo.data.noDatum.filter(
-                  ({ txHash, outputIndex }) =>
-                    txHash !== outRef.txHash ||
-                    outputIndex != outRef.outputIndex,
-                )
+              ? CampaignInfo.data.noDatum.filter(({ txHash, outputIndex }) => txHash !== outRef.txHash || outputIndex != outRef.outputIndex)
               : [],
           },
         },
