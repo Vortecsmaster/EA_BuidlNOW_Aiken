@@ -20,17 +20,13 @@ pub type Action {
 }
 
 validator ea_coins {
-  mint(
-    redeemer: ConditionsRedeemer,
-    _policy_id: PolicyId,
-    transaction: Transaction,
-  ) {
+  mint(redeemer: ConditionsRedeemer, _policy_id: PolicyId, transaction: Transaction) {
     when redeemer.action is {
-      Owner -> must_be_signed_by(transaction, redeemer.owner)?
       Time -> must_happen_before(transaction.validity_range, redeemer.deadline)?
+      Owner -> must_be_signed_by(transaction, redeemer.owner)?
+      
     }
   }
-
   else(_) {
     fail
   }
@@ -42,7 +38,7 @@ fn must_be_signed_by(transaction: Transaction, vk: VerificationKeyHash) {
 
 fn must_happen_before(range: ValidityRange, lock_expiration_time: Int) {
   when range.upper_bound.bound_type is {
-    Finite(tx_latest_time) -> (lock_expiration_time <= tx_latest_time)?
+    Finite(tx_latest_time) -> (lock_expiration_time >= tx_latest_time)?
     _ -> False
   }
 }

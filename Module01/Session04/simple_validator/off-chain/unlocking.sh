@@ -1,4 +1,4 @@
-utxoin="49913745c00113942b8be1477ec393824342ecc80539cd9c93862e81588faa46#0"
+utxoin="9420ab95a7e75595c8004a1ae46f30b631047ae4a19bba065b180ccf7cf0dd04#0"
 address=$nami3
 collateral="4cbf990857530696a12b0062546a4b123ad0bef21c67562e32d03e3288bdcd7b#0" 
 output="100000000"
@@ -9,12 +9,13 @@ cardano-cli conway transaction build \
   --testnet-magic 2 \
   --tx-in $utxoin \
   --tx-in-script-file ./compiled/simple.uplc \
-  --tx-in-datum-file ./values/datum.json \
+  --tx-in-inline-datum-present \
   --tx-in-redeemer-file ./values/value_0.json \
   --required-signer-hash $signer1 \
   --required-signer-hash $signer2 \
   --tx-in-collateral $collateral \
   --tx-out $address+$output \
+  --tx-out $address+$value_input_minus_allotheroutputs_minus_fee \
   --change-address $nami3 \
   --out-file simple_unlocking.unsigned
 

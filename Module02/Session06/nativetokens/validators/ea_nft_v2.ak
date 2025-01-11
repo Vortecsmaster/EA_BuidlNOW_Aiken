@@ -16,7 +16,7 @@ pub type ConditionsRedeemer {
 
 /// - 0 -> Owner
 /// - 1 -> Time
-pub type Action =
+pub type Action = 
   Int
 
 validator ea_nft(unique_utxo: OutputReference, token_name: AssetName) {

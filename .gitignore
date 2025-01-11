@@ -19,3 +19,4 @@ Cargo.lock
 *.signed
 *.unsigned
 *.uplc
+*.pid
