@@ -19,7 +19,7 @@ pub type ConditionsRedeemer {
 pub type Action = 
   Int
 
-validator ea_nft(unique_utxo: OutputReference, token_name: AssetName) {
+validator ea_nft_v1(unique_utxo: OutputReference, token_name: AssetName) {
   mint(
     redeemer: ConditionsRedeemer,
     policy_id: PolicyId,
