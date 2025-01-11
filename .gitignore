@@ -21,3 +21,7 @@ Cargo.lock
 *.uplc
 *.pid
 output.json
+Module02/Session06/nativetokens/plutus.json
+*.pid
+*.pid
+Module02/Session06/crowdfunding_v01/plutus.json
