@@ -26,7 +26,7 @@ validator ea_nft(unique_utxo: OutputReference, token_name: AssetName) {
     transaction: Transaction,
   ) {
     and {
-      utxo_spent(unique_utxo, transaction)?,
+      utxo_spent(unique_utxo, transaction)?, 
       there_can_be_only_one(transaction, policy_id, token_name)?,
       when redeemer.action is {
         // Owner:
@@ -56,9 +56,15 @@ pub fn there_can_be_only_one(
   token_name: AssetName,
 ) {
   let Transaction { mint, .. } = tx_info
-  expect [Pair(asset_name, amount)] = dict.to_pairs(assets.tokens(mint, policy_id))
+  expect [Pair(asset_name, amount)] = 
+    mint 
+    |> assets.tokens(policy_id)
+    |> dict.to_pairs
+
   (amount == 1) && (asset_name == token_name)  
 }
+
+
 
 pub fn must_be_signed_by(transaction: Transaction, vk: VerificationKeyHash) {
   list.has(transaction.extra_signatories,vk)

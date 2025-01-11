@@ -16,7 +16,12 @@ pub type CFdatum {
 ///  0 -> Cancel Campaign
 ///  1 -> Support Campaign
 ///  2 -> Claims
+<<<<<<< Updated upstream
 pub type CFredeemer =
+=======
+///
+pub type Action =
+>>>>>>> Stashed changes
   Int
 
 ///  0 -> Forge Campaign Token
@@ -47,7 +52,19 @@ validator manage_campaign(campaign_id: Int, title: ByteArray, creator: Verificat
            transaction.extra_signatories,
         )
 
+<<<<<<< Updated upstream
       2 -> claims(datum, creator, transaction.extra_signatories)
+=======
+      1 ->
+        support_campaign(
+          datum,
+          redeemer,
+          utxo,
+          transaction,
+        )
+
+      2 -> claims(datum, redeemer.campaign_id, transaction.extra_signatories)
+>>>>>>> Stashed changes
       _ -> fail
     }
   }
@@ -115,6 +132,7 @@ fn cancel_campaign(
 /// Update conditions
 ///    Datum.campaignId == Redeemer.campaignId
 ///    Datum.backer => Authorize his support by signing the transaction.
+<<<<<<< Updated upstream
 ///
 fn support_campaign(
   datum: CFdatum,
@@ -124,6 +142,19 @@ fn support_campaign(
     datum.backer,
     signatories,
   )
+=======
+/// Redeemer include the supporter and amount.
+/// Datum.current_funds must be equal to its input value plus the defined support value (CFredeemer.ammount).
+
+
+fn support_campaign(datum: CFdatum, redeemer: CFredeemer, utxo: OutputReference, tx_info: Transaction) -> Bool {
+  datum.campaign_id == redeemer.campaign_id && 
+  output_datum_updated(datum, redeemer, utxo, tx_info) && 
+  must_be_signed_by(redeemer.backer, tx_info.extra_signatories)
+
+
+  // datum.campaign_id == campaign_id && must_be_signed_by(datum.backer, signatories)
+>>>>>>> Stashed changes
 }
 
 /// Claims conditions
@@ -140,6 +171,46 @@ fn claims(
     signatories,
   )
 }
+
+fn output_datum_updated(datum: CFdatum, redeemer: CFredeemer, utxo: OutputReference, tx_info: Transaction) -> Bool {
+  let input_datum = complete_datum(datum,tx_info.datums)
+  
+}  
+
+fn complete_datum(
+  input_datum: CFDatum,
+  datums: Dict<DataHash, Data>,
+) -> (DataHash, Data) {
+  expect Some(data_hash) = dict.find(datums, input_datum)
+
+  let data_hash: DataHash = data_hash
+  let data: Data = input_datum
+
+  (data_hash, data)
+}
+
+fn updated_output(
+  input_datum: (DataHash, Data),
+  outputs: List<Output>,
+  address: Address,
+) -> Bool {
+  let counter =
+    list.count(
+      outputs,
+      fn(output) -> Bool {
+        output.address == address && when output.datum is {
+          NoDatum -> False
+          DatumHash(datum_hash) -> datum_hash == input_datum.1st
+          InlineDatum(datum_data) -> datum_data == input_datum.2nd
+        }
+      },
+    )
+
+  counter == 1
+}
+
+
+
 
 fn must_be_signed_by(
   signer: VerificationKeyHash,

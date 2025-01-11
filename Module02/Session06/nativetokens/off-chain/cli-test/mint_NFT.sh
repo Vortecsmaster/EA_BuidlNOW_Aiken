@@ -1,5 +1,5 @@
-utxoin1="946500cb21ac2f0e1645e11632f53cef21b3e28b3993e7ea910cfd96fbc7e424#0"
-policyid=$(cat ../compiled/ea_nft.pid)
+utxoin1="a1c352418910241eca85a1546c8a2f70edc5bc9ffc19c024e1136f702e0ea4c4#1"
+policyid=$(cat ../compiled/Params_ea_nft.pid)
 output="11000000"
 tokenamount="1"
 tokenname="$(echo -n "WoW_NFT-λ-🐦😍" | xxd -ps | tr -d '\n')"
@@ -24,6 +24,7 @@ cardano-cli conway transaction build \
 cardano-cli conway transaction sign \
     --tx-body-file mint_NFT.unsigned \
     --signing-key-file $HOME/Dev/Wallets/Bob.skey \
+    --signing-key-file $HOME/Dev/Wallets/IAlice.skey \
     --signing-key-file $HOME/Dev/Wallets/Adr07.skey \
     $PREVIEW \
     --out-file mint_NFT.signed
