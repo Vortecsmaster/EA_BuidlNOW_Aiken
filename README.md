@@ -47,19 +47,19 @@ Minting validator:
 
 - [showcase repo](https://github.com/ariady-putra-emurgo/aiken_minting_validator): `always_true`, `check_redeemer`, `check_redeemer_2`, `nft`
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_minting_exercise): Run `aiken c`, replace all **todos** with actual code
-- [answer repo](https://github.com/ariady-putra-emurgo/aiken_minting_answer): This project contains the code for the exercise validators
+- [answer repo](https://github.com/ariady-putra-emurgo/aiken_minting_answer): This project contains the answer code for the exercise validators
 
 Spending validator:
 
 - [showcase repo](https://github.com/ariady-putra-emurgo/aiken_spending_validator): `check_datum`, `check_redeemer`, `sc_wallet`, `receipts`, `cip_68`
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_spending_exercise): Run `aiken c`, replace the `todo` with actual code and fix CIP-68 validator
-- [answer repo](https://github.com/ariady-putra-emurgo/aiken_spending_answer): This project contains the code for the exercise validators
+- [answer repo](https://github.com/ariady-putra-emurgo/aiken_spending_answer): This project contains the answer code for the exercise validators
 
 Staking validator:
 
 - [showcase repo](https://github.com/ariady-putra-emurgo/aiken_staking_validator): `withdraw` and `publish` handlers, `else` block, withdraw-zero trick
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_staking_exercise): Run `aiken c`, replace all **todos** with actual code
-- [answer repo](https://github.com/ariady-putra-emurgo/aiken_staking_answer): This project contains the code for the exercise validators
+- [answer repo](https://github.com/ariady-putra-emurgo/aiken_staking_answer): This project contains the answer code for the exercise validators
 
 ### Testing and Debugging
 
@@ -67,3 +67,4 @@ Staking validator:
 
 - [showcase repo](https://github.com/ariady-putra-emurgo/aiken_check_showcase): Unit tests, property tests, and validator tests
 - [exercise repo](https://github.com/ariady-putra-emurgo/aiken_check_exercise): Your task is to FIX All the unit tests, property tests, and validator tests
+- [answers repo](https://github.com/ariady-putra-emurgo/aiken_check_answers): This project contains the answers to the exercise repo
