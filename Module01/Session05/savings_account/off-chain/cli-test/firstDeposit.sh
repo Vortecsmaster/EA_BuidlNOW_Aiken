@@ -1,6 +1,6 @@
-utxoin="c97d077954b9e112612c563ca1409befbdb9d39f16e57e6dd4bea5f468d8415a#0"
+utxoin="7ed6b69cd7feb5608372f9d950c3be6b89a6a1ca1f30b856679a4fcdcfd0f924#1"
 address=$(cat ../compiled/savings.addr) 
-output="5000000000"
+output="110000000"
 
 cardano-cli conway transaction build \
   $PREVIEW \
@@ -12,7 +12,7 @@ cardano-cli conway transaction build \
 
 cardano-cli conway transaction sign \
     --tx-body-file deposit.unsigned \
-    --signing-key-file $HOME/Dev/Wallets/Adr08.skey \
+    --signing-key-file $HOME/Dev/Wallets/Adr03.skey \
     $PREVIEW \
     --out-file deposit.signed
 

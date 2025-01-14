@@ -13,6 +13,7 @@ import {Blockfrost,
         fromText,
         PROTOCOL_PARAMETERS_DEFAULT } from "npm:@lucid-evolution/lucid";
 import bob_signingKey from "/home/cardano/Dev/Wallets/Bob_skey.json" with {type: 'json'};
+import adr08_signingKey from "/home/cardano/Dev/Wallets/Adr08_skey.json" with {type: 'json'};
 import {networkConfig} from "./settings.ts"
 import { Result } from "./types.ts";
 
@@ -40,8 +41,9 @@ const bobStakeCredential: Credential = {
 const bobSigningkey = bob_signingKey.ed25519;
 
 console.log("bob sk: " + bobSigningkey);
+console.log("adr08 sk: " + adr08_signingKey.ed25519);
 
-lucid.selectWallet.fromPrivateKey(bobSigningkey);
+lucid.selectWallet.fromPrivateKey(adr08_signingKey.ed25519);
 const bobAddress = await lucid.wallet().address();
 
 console.log("Address: " + bobAddress);
@@ -86,13 +88,26 @@ const cancel_campaign = async (): Promise<Result<string>> => {
     const campaigns_utxos = await lucid.utxosAt(campaignsAddress);
     const campaign_utxo = campaigns_utxos.find((utxo) => {
       if (utxo.datum) {
-        console.log("Datum: " + utxo.datum);
+        // console.log("Datum: " + utxo.datum);
         const dat = Data.from(utxo.datum, CFDatum)
+        console.log(dat.campaign_id)
         console.log(dat.deadline)
-        return utxo}
+        return dat.deadline === 1731883588000n}
     });
 
- const redeemer = Data.to(0n);
+ 
+const redeemer = Data.to(new Constr(0, [1n,0n,0n,""]));
+
+console.log("Redeemer: " + Data.from(redeemer));
+
+
+//  pub type CFredeemer {
+//   campaign_id: Int,
+//   action: Action,
+//   amount: Int,
+//   backer: VerificationKeyHash,
+// }
+
  console.log("Campaign UTXO: " + campaign_utxo);
  console.log("------------------------------------------------------------------------------------------------------------------------");
     const tx = await lucid
@@ -101,16 +116,16 @@ const cancel_campaign = async (): Promise<Result<string>> => {
       .attach.SpendingValidator(validator)
       .pay.ToAddress(bobAddress, {lovelace: 2000000n})
       .addSigner(bobAddress)
-      .validFrom(Date.now())
+      .validTo(Date.now())
       .complete({});
 
-    console.log("Tx: " + tx);
-    //  const signedTx = await tx.sign.withWallet().complete();
-    //  const txHash = await signedTx.submit();
+    // console.log("Tx: " + tx);
+    const signedTx = await tx.sign.withWallet().complete();
+    const txHash = await signedTx.submit();
 
-      console.log("TODO BIEN!")
-      // return { type: "ok", data: txHash };
-      return { type: "ok", data: "tx Built!" };
+    console.log("TODO BIEN!")
+    return { type: "ok", data: txHash };
+    //   return { type: "ok", data: "tx Built!" };
     }
    catch (error) {
      console.log("Error: " + error);

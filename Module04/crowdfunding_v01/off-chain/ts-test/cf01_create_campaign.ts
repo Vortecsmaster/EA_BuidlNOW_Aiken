@@ -11,7 +11,7 @@ import {Blockfrost,
         Constr,
         Data,
         fromText } from "npm:@lucid-evolution/lucid";
-//import * as cbor from "https://deno.land/x/cbor@v1.4.1/index.js";
+
 import bob_signingKey from "/home/cardano/Dev/Wallets/Bob_skey.json" with {type: 'json'};
 import adr08_signingKey from "/home/cardano/Dev/Wallets/Adr08_skey.json" with {type: 'json'};
 import {networkConfig} from "./settings.ts"
